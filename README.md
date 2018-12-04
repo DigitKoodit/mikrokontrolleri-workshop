@@ -10,6 +10,8 @@ Backend on tehty Node.js, Express ja SQLite tekniikoilla. Frontend on toteutettu
 
 Seuraa näitä ohjeita: [Linkki](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/).
 
+Oikea Board-asetus on **LOLIN(WEMOS) D1 R2 & mini**.
+
 ### 2. Alusta Git-repositorio (vapaaehtoinen)
 
 **Disclaimer:** Gitin käyttäminen ei ole täysin pakollista, mutta erittäin suotavaa, koska se helpottaa ryhmätyön
