@@ -5,14 +5,32 @@ C++–ohjelmointikielen kaltaista koodia, ja puskee keräämäänsä dataa JSON-
 
 Backend on tehty Node.js, Express ja SQLite tekniikoilla. Frontend on toteutettu JavaScript ja React tekniikoilla.
 
-## Ohjeet
-### 1. Asenna Arduino IDE
+## Esivaatimukset
+
+### 1. Asenna Arduino IDE ja ESP8266-lisäri
 
 Seuraa näitä ohjeita: [Linkki](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/).
 
 Oikea Board-asetus on **LOLIN(WEMOS) D1 R2 & mini**.
 
-### 2. Alusta Git-repositorio (vapaaehtoinen)
+### 2. Asenna Node.js ja create-react-app
+
+Asenna Node.js versio 10 joko [täältä](https://nodejs.org/) tai NVM:n (Node Version Manager) avulla 
+[täältä](https://github.com/creationix/nvm).
+
+NVM:n kanssa itse Node.js asentuu juoksemalla terminaalissa:
+```
+nvm install 10
+nvm use 10
+```
+
+Create-react-app asentuu kivasti NPM:llä:
+```
+npm install --global create-react-app
+```
+
+## Ohjeet
+### 1. Alusta Git-repositorio (vapaaehtoinen)
 
 **Disclaimer:** Gitin käyttäminen ei ole täysin pakollista, mutta erittäin suotavaa, koska se helpottaa ryhmätyön
 tekemistä huomattavasti.
