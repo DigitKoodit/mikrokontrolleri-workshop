@@ -48,7 +48,10 @@ README.md helppoa kloonausta varten.
 
 Navigoi projektin kansioon ja juoke siellä seuraava komento, joka alustaa Node.js-sovelluksen.
 ```shell
-npm init ./server
+mkdir server
+cd server
+npm init
 ```
+Vakioasetukset toimii, mutta saa toki halutessaan muuttaa.
 
 Rakentele tänne fiksua kamaa, joka vastaanottaa dataa sääasema-laitteelta.
