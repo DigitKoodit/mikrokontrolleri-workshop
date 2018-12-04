@@ -22,7 +22,7 @@ README.md helppoa kloonausta varten.
 
 ### 2. Rakenna IoT-härpätin
 
-// TODO: kirjoita ohjeet
+![alt text](https://github.com/DigitKoodit/mikrokontrolleri-workshop/blob/master/schematic.png)
 
 ### 3. Pystytä minimalistinen palvelin
 
