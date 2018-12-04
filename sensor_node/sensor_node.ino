@@ -2,23 +2,48 @@
 // https://github.com/DigitKoodit/mikrokontrolleri-workshop
 
 
+#include <Arduino.h>
+
 #include <ESP8266WiFi.h>
-#include <ESP8266WiFiAP.h>
-#include <ESP8266WiFiGeneric.h>
 #include <ESP8266WiFiMulti.h>
-#include <ESP8266WiFiScan.h>
-#include <ESP8266WiFiSTA.h>
-#include <ESP8266WiFiType.h>
-#include <WiFiClient.h>
-#include <WiFiClientSecure.h>
-#include <WiFiServer.h>
-#include <WiFiServerSecure.h>
-#include <WiFiUdp.h>
+
+#include <ESP8266HTTPClient.h>
+
+// #include <Adafruit_BME280.h>
+
+ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
-  // put your setup code here, to run once:
+  	Serial.begin(115200);
+
+
+  	WiFi.mode(WIFI_STA);
+  	WiFiMulti.addAP("SSID", "passwd");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+	// String payload = "";
+	if (WiFiMulti.run() == WL_CONNECTED)
+	{
+		HTTPClient http;
+
+		Serial.printf("[HTTP] begin...");
+
+		http.begin("http://192.168.43.251:8080/api/readings");
+
+		
+
+		int httpcode = http.POST("Konsta ei osaa koodaa");
+
+		if (httpcode == HTTP_CODE_OK)
+		{
+			Serial.printf("Toimii :D");
+		}else{
+			Serial.printf("Ei toimi :(");
+		}
+
+		http.end();
+	}
+
+	delay(10000);
 }
