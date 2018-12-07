@@ -44,6 +44,12 @@ README.md helppoa kloonausta varten.
 
 ![kytkentakaavio](https://github.com/DigitKoodit/mikrokontrolleri-workshop/blob/master/schematic.png)
 
+Kytkentöjä tehtäessä on hyvä ottaa virrat pois laitteista, ettei vahingossa oikosulkuun sohaistut komponentit päästä toimintasavuja pihalle. 
+
+Kytketään siis laudan 3.3V nasta (merkitty 3V3) sensorin Vin-nastaan ja ground-nastat toisiinsa. Näitä voi ajatella vastaavasti plus- ja miinusnapoina. Sitten kytketään D1 -> SCL ja D2 -> SDA.
+
+Sensori käyttää I2C-standardin väylää tiedonsiirtoon ja tämän laudan I2C-nastat ovat oletuksena D1 (SCL) ja D2 (SDA). Nämä voi vaihtaa minkä tahansa GPIO-nastojen kanssa, mikäli kokee tarpeelliseksi. Esimerkkiohjelma on tehty kuvassa näkyvällä kytkennällä.
+
 ### 3. Pystytä minimalistinen testipalvelin
 
 Navigoi projektin kansioon ja juoke siellä seuraava komento, joka alustaa Node.js-sovelluksen.
