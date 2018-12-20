@@ -9,7 +9,7 @@ Backend on tehty Node.js, Express ja SQLite tekniikoilla. Frontend on toteutettu
 
 ### 1. Asenna Arduino IDE ja ESP8266-lisäri
 
-Seuraa näitä ohjeita: [Linkki](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/).
+Seuraa näitä ohjeita: [////(Linkki)////](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/).
 
 Oikea Board-asetus on **LOLIN(WEMOS) D1 R2 & mini**.
 
