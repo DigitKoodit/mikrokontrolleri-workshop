@@ -4,6 +4,6 @@ Digitin koodikerho ja elektroniikkatyyppi(n)en kerho löivät hynttyyt yhteen ja
 Workshopissa pääset luomaan älykkäitä sensoreita ESP8266-alustalla sekä web-palvelun, jolla sensoridataa voidaan tallentaa ja esittää nätisti.
 Workshopista saat 3€ hintaan lunastettua itsellesi paketin, mikä sisältää tarvittavat kehityslaudat ja koekytkentälaudan sekä lipo-latauspiirin, millä valmiin sensorin saa toimimaan akulla. Workshoppiin voi osallistua yksin tai pareittain.
 
-Workshopia varten tarvitset tietokoneen (Sori, Chromebookit ja tabletit ei käy), micro USB-kaapelin ja Arduino IDE:n https://www.arduino.cc/en/main/software . Mikäli käytät Windowsia tarvitset myös Git Bashin. Muitakin yhdistelmiä saa käyttää, mutta emme välttämättä osaa auttaa esim. PlatformIO, WSL yms. conffaamisessa.
+Workshopia varten tarvitset tietokoneen (Sori, Chrome OS ja tabletit ei käy), micro USB-kaapelin ja Arduino IDE:n https://www.arduino.cc/en/main/software . Mikäli käytät Windowsia tarvitset myös Git Bashin. Muitakin yhdistelmiä saa käyttää, mutta emme välttämättä osaa auttaa esim. PlatformIO, WSL yms. conffaamisessa.
 
 TL:DR; IoT-workshop, 3 kolea, 
