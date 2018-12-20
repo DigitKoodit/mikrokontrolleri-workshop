@@ -1,4 +1,4 @@
-# mikrokontrolleri-workshop
+# IoT-workshop
 Koodikerhon mikrokontrolleri workshop jossa rakennellaan sääasema IoT-härpätin ja nettisivu, josta pääsee
 katselemaan kerättyä dataa. Alustana sääasemalle on ESP8266-mikrokontrolleri, joka ajaa Arduino-yhteensopivaa 
 C++–ohjelmointikielen kaltaista koodia, ja puskee keräämäänsä dataa JSON-muodossa HTTP POST -pyynnöllä serverille.
