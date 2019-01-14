@@ -11,10 +11,13 @@
   "author": "Konsta Purtsi",
   "license": "MIT",
   "dependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/express": "^4.16.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4"
   },
   "devDependencies": {
+    "axios": "^0.18.0",
     "typescript": "^3.2.2"
   }
 }
