@@ -1,39 +1,42 @@
 # Palvelin
 
-### 1. Pystytä minimalistinen testipalvelin
+### 1. Alusta palvelin projekti
 
-Navigoi projektin kansioon ja juoke siellä seuraava komento, joka alustaa Node.js-sovelluksen.
+
+Navigoi projektin kansioon ja juoke siellä seuraava komento, joka alustaa TypeScript-sovelluksen.
 ```shell
 mkdir server
 cd server
-npm init
+npm init -y
 ```
-Vakioasetukset toimii, mutta saa toki halutessaan muuttaa.
 
-Asenna depsut eli Express ja Body-parser:
+Asenna TypeScript ja alusta TypeScript-projekti:
 ```shell
-npm install --save express body-parser
+npm install --save-dev typescript
+tsc --init
 ```
 
-Paiskaa server.js-tiedostoon testipalvelimen koodi:
-
-```javascript
-const express = require("express");
-const bodyParser = require("body-parser");
-
-const app = express();
-app.use(bodyParser.json());
-
-app.post("/api/readings", (req, res) => {
-    console.log("Received new POST request");
-    console.log(req.body)
-    res.status(200).json(req.body);
-});
-
-const port = process.env.PORT ? process.env.PORT : 8080;
-const server = app.listen(port, () => {
-    console.log("Server listening on port %s", port);
-});
+Lisää `tsconfig.json`-tiedostoon outDir-asetus:
+```
+{
+  "compilerOptions": {
+    ...
+    "outDir": "./build",
 ```
 
-Aja palvelin komennolla `npm start`.
+Aseta package.json tiedostoon build- ja start-komennot:
+```
+"scripts": {
+  "build": "tsc -p tsconfig.json",
+  "start": "npm run build && node ./build",
+  ...
+```
+
+Luo `src/index.ts`-tiedosto:
+```typescript
+console.log('Helou Koodi- ja Eltykerho!');
+```
+
+Lisää `.gitignore`-tiedostoon `build/`-kansio.
+
+Juokse `npm start` ja katso mitä tapahtuu!
