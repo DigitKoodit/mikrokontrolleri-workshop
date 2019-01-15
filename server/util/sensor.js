@@ -9,4 +9,4 @@ axios.post('http://localhost:8080/newreading', {
     humidity: round(14 + (76 * Math.random()))
   })
   .then(() => console.log('success'))
-  .catch(() => console.error('error'));
+  .catch(err => console.log('Error:', err.response.data));
