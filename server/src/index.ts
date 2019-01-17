@@ -1,11 +1,22 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 
+import { assertReading } from './util';
+
 const app = express();
 app.use(bodyParser.json());
 
 app.post('/newreading', (req: Request, res: Response) => {
-  console.log('received new reading', req.body);
+  console.log('received new reading:', req.body);
+
+  try {
+    assertReading(req.body);
+  }
+  catch (error) {
+    res.status(400).send(error);
+    return;
+  }
+
   res.send(req.body);
 });
 
