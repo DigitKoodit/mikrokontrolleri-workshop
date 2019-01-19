@@ -1,10 +1,8 @@
 // Digitin koodikerho & elektroniikkakerho IoT workshop
 // https://github.com/DigitKoodit/mikrokontrolleri-workshop
 
-
-
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
 
@@ -15,10 +13,8 @@
 #define I2C_ADDR 0x76 	// define the sensor i2c address
 #define SSID "" 		// Wifi SSID
 #define PASSWD "" 		// Wifi passwd
-#define IP "http://192.168.0.107:8080/api/readings"			// Server IP-address
+#define IP "http://192.168.0.0:8080/newreading"			// Server IP-address
 #define NAME "TestiPalikka"			// Group name
-
-
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -53,6 +49,7 @@ void loop() {
 
 	data.printTo(output);
   	data.prettyPrintTo(Serial);
+  	Serial.println();
 	
 	if (WiFiMulti.run() == WL_CONNECTED)
 	{
