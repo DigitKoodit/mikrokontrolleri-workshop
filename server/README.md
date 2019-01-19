@@ -125,8 +125,7 @@ app.post('/newreading', (req: Request, res: Response) => {
     assertReading(req.body);
   }
   catch (error) {
-    res.status(400).send(error);
-    return;
+    return res.status(400).send(error);
   }
 
   res.send(req.body);
@@ -148,25 +147,29 @@ Luodaan `dbUtils.ts`-tiedosto kannan kanssa painimista varten.
 ```TypeScript
 import sqlite3 from 'sqlite3';
 
+const db = new sqlite3.Database('database.db');
+
 const initializeDB = () => {
-  const db = new sqlite3.Database('database.db');
-
   db.run(`CREATE TABLE IF NOT EXISTS sensor (
-    name TEXT PRIMARY KEY,
-    firstonline TEXT NOT NULL,
-    lastonline TEXT NOT NULL
-  )`);
+      name TEXT PRIMARY KEY,
+      firstonline TEXT NOT NULL,
+      lastonline TEXT NOT NULL
+    )`)
+    .run(`CREATE TABLE IF NOT EXISTS reading (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sensorname TEXT,
+      temperature NUMERIC(10,2),
+      pressure NUMERIC(10,2),
+      humidity NUMERIC(10,2),
+      FOREIGN KEY (sensorname) REFERENCES sensor(name)
+    )`, err => {
+      if (err) {
+        return console.log('Database initialization failed.', err);
+      }
 
-  db.run(`CREATE TABLE IF NOT EXISTS reading (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    temperature NUMERIC(5,2),
-    pressure NUMERIC(5,2),
-    humidity NUMBERIC(5,2),
-    sensorname TEXT,
-    FOREIGN KEY (sensorname) REFERENCES sensor(name)
-  )`);
+      console.log('Database up and running!');
+    });
 
-  return db;
 };
 
 export { initializeDB };
