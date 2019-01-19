@@ -26,8 +26,8 @@ ESP8266WiFiMulti WiFiMulti;
 Adafruit_BME280 bme;
 
 // Initialize json document
-const int capacity = JSON_OBJECT_SIZE(4);
-StaticJsonBuffer<capacity> jb;
+const int capacity = JSON_OBJECT_SIZE(8);
+
 
 void setup() {
   	Serial.begin(115200);
@@ -42,7 +42,7 @@ void setup() {
 }
 
 void loop() {
-	
+	StaticJsonBuffer<capacity> jb;
   	char output[128];
 	JsonObject& data = jb.createObject();
 
