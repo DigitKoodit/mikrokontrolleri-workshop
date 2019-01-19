@@ -2,24 +2,26 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 
 import { assertReading } from './util';
-import { initializeDB } from './dbUtils';
+import {initializeDB, insertReading} from './dbUtils';
 
 const app = express();
 app.use(bodyParser.json());
-const db = initializeDB();
+initializeDB();
 
 app.post('/newreading', (req: Request, res: Response) => {
-  console.log('received new reading:', req.body);
+  const reading: Reading = req.body;
+  console.log('received new reading:', reading);
 
   try {
-    assertReading(req.body);
+    assertReading(reading);
   }
   catch (error) {
-    res.status(400).send(error);
-    return;
+    return res.status(400).send(error);
   }
 
-  res.send(req.body);
+  insertReading(reading);
+
+  res.send(reading);
 });
 
 
