@@ -13,9 +13,9 @@
 #include <ArduinoJson.h>
 
 #define I2C_ADDR 0x76 	// define the sensor i2c address
-#define SSID "Ebinverkko" 		// Wifi SSID
-#define PASSWD "EllukkaOnPomo" 		// Wifi passwd
-#define IP "http://192.168.0.1:8080/api/readings"			// Server IP-address
+#define SSID "" 		// Wifi SSID
+#define PASSWD "" 		// Wifi passwd
+#define IP "http://192.168.0.107:8080/api/readings"			// Server IP-address
 #define NAME "TestiPalikka"			// Group name
 
 
