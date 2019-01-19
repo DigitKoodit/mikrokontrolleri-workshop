@@ -27,7 +27,7 @@ Adafruit_BME280 bme;
 
 // Initialize json document
 const int capacity = JSON_OBJECT_SIZE(4);
-StaticJsonDocument<capacity> jb;
+StaticJsonBuffer<capacity> jb;
 
 void setup() {
   	Serial.begin(115200);
@@ -43,30 +43,25 @@ void setup() {
 
 void loop() {
 	
-  	String output;
-	JsonObject& data = jb.createNestedObject();
+  	char output[128];
+	JsonObject& data = jb.createObject();
+
 	data["name"] = NAME;
 	data["temperature"] = bme.readTemperature();
 	data["pressure"] = bme.readPressure();
 	data["humidity"] = bme.readHumidity();
-	serializeJson(data, output);
-  	serializeJsonPretty(data, Serial);
+
+	data.printTo(output);
+  	data.prettyPrintTo(Serial);
 	
 	if (WiFiMulti.run() == WL_CONNECTED)
 	{
 		HTTPClient http;
 
-		
-	
-  		
-		
-
 		Serial.printf("[HTTP] begin...");
 
 		http.begin(IP);
 		http.addHeader("Content-Type", "application/json");
-
-		
 
 		int httpcode = http.POST(output);
 
