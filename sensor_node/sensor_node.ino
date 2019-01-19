@@ -13,7 +13,7 @@
 #define I2C_ADDR 0x76 	// define the sensor i2c address
 #define SSID "" 		// Wifi SSID
 #define PASSWD "" 		// Wifi passwd
-#define IP "http://192.168.0.0:8080/newreading"			// Server IP-address
+#define IP "http://192.168.0.107:8080/newreading"			// Server IP-address
 #define NAME "TestiPalikka"			// Group name
 
 ESP8266WiFiMulti WiFiMulti;
@@ -55,7 +55,7 @@ void loop() {
 	{
 		HTTPClient http;
 
-		Serial.printf("[HTTP] begin...");
+		Serial.println("[HTTP] begin...");
 
 		http.begin(IP);
 		http.addHeader("Content-Type", "application/json");
