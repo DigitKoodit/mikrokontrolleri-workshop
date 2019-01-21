@@ -65,7 +65,7 @@ app.post('/api/newreading', (req: Request, res: Response) => {
 });
 
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
@@ -317,6 +317,6 @@ app.get('/api/getreadings', (req: Request, res: Response) => {
 ```
 
 Tsekkaa nyt selaimella mitä löytyy osoitteista
-http://localhost:8080/api/getsensors ja http://localhost:8080/api/getreadings.
+http://localhost:3001/api/getsensors ja http://localhost:3001/api/getreadings.
 
 **Siirrytään frontendin kimppuun!**
