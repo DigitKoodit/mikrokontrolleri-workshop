@@ -3,55 +3,106 @@ import sqlite3 from 'sqlite3';
 const db = new sqlite3.Database('database.db');
 
 const initializeDB = () => {
-  db.run(`CREATE TABLE IF NOT EXISTS sensor (
+  const sensorTableQuery = `
+    CREATE TABLE IF NOT EXISTS sensor (
       name TEXT PRIMARY KEY,
       firstonline TEXT NOT NULL,
       lastonline TEXT NOT NULL
-    )`)
-    .run(`CREATE TABLE IF NOT EXISTS reading (
+    )
+  `;
+
+  const readingTableQuery = `
+    CREATE TABLE IF NOT EXISTS reading (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       sensorname TEXT,
       temperature NUMERIC(10,2),
       pressure NUMERIC(10,2),
       humidity NUMERIC(10,2),
       FOREIGN KEY (sensorname) REFERENCES sensor(name)
-    )`, err => {
+    )
+  `;
+
+  db.run(sensorTableQuery)
+    .run(readingTableQuery, err => {
       if (err) {
         return console.log('Database initialization failed.', err);
       }
 
       console.log('Database up and running!');
     });
-
 };
 
 const insertReading = (reading: Reading) => {
-  const { name, temperature, pressure, humidity } = reading;
-  const timestamp = new Date().toISOString();
+  const {
+    name: $name,
+    temperature: $temperature,
+    pressure: $pressure,
+    humidity: $humidity
+  } = reading;
 
-  db.run(`
-      INSERT OR IGNORE INTO sensor (name, firstonline, lastonline) VALUES ($name, $lastonline, $lastonlone)
-    `, {
-      $name: name,
-      $lastonline: timestamp
-    })
-    .run(`
-      UPDATE sensor SET lastonline = $lastonline WHERE name = $name
-    `, {
-      $lastonline: timestamp,
-      $name: name
-    })
-    .run(
-      `INSERT INTO reading (sensorname, temperature, pressure, humidity) VALUES (?, ?, ?, ?)`,
-      [name, temperature, pressure, humidity],
-      err => {
-        if (err) {
-          return console.log('Error inserting a new reading', err);
-        }
+  const $timestamp = new Date().toISOString();
 
-        console.log('Inserted new reading successfully');
+  const insertSensorQuery = `
+    INSERT OR IGNORE INTO sensor (name, firstonline, lastonline)
+    VALUES ($name, $timestamp, $timestamp)
+  `;
+
+  const updateSensorQuery = `
+    UPDATE sensor
+    SET lastonline = $timestamp
+    WHERE name = $name
+  `;
+
+  const insertReadingQuery = `
+    INSERT INTO reading (sensorname, temperature, pressure, humidity)
+    VALUES ($name, $temperature, $pressure, $humidity)
+  `;
+
+  db.run(insertSensorQuery, { $name, $timestamp })
+    .run(updateSensorQuery, { $timestamp, $name })
+    .run(insertReadingQuery, { $name, $temperature, $pressure, $humidity }, err => {
+      if (err) {
+        return console.log('Error inserting a new reading', err);
       }
-    );
+
+      console.log('Inserted new reading successfully');
+    });
 };
 
-export { initializeDB, insertReading };
+const getSensors = async () => {
+  const query = `
+    SELECT *
+    FROM sensor
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching sensors failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  })
+};
+
+const getReadings = async () => {
+  const query = `
+    SELECT sensorname, temperature, pressure, humidity
+    FROM reading
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching readings failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  });
+};
+
+export { initializeDB, insertReading, getSensors, getReadings };

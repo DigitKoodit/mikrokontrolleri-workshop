@@ -15,12 +15,14 @@ npm install --save-dev typescript
 tsc --init
 ```
 
-Lisää `tsconfig.json`-tiedostoon outDir-asetus:
+Lisää `tsconfig.json`-tiedostoon lib ja outDir-kentät:
 ```
 {
   "compilerOptions": {
     ...
+    "lib": ["es2015"],
     "outDir": "./build",
+    ...
 ```
 
 Aseta package.json tiedostoon build- ja start-komennot:
@@ -55,7 +57,7 @@ import bodyParser from 'body-parser';
 const app = express();
 app.use(bodyParser.json());
 
-app.post('/newreading', (req: Request, res: Response) => {
+app.post('/api/newreading', (req: Request, res: Response) => {
   console.log('received new reading:', req.body);
   res.send(req.body);
 });
@@ -118,14 +120,14 @@ import { assertReading } from './util';
 const app = express();
 app.use(bodyParser.json());
 
-app.post('/newreading', (req: Request, res: Response) => {
+app.post('/api/newreading', (req: Request, res: Response) => {
   console.log('received new reading:', req.body);
 
   try {
     assertReading(req.body);
   }
   catch (error) {
-    return res.status(400).send(error);
+    return res.status(400).send(error); // HTTP 400 Bad Request
   }
 
   res.send(req.body);
@@ -150,26 +152,33 @@ import sqlite3 from 'sqlite3';
 const db = new sqlite3.Database('database.db');
 
 const initializeDB = () => {
-  db.run(`CREATE TABLE IF NOT EXISTS sensor (
+  const sensorTableQuery = `
+    CREATE TABLE IF NOT EXISTS sensor (
       name TEXT PRIMARY KEY,
       firstonline TEXT NOT NULL,
       lastonline TEXT NOT NULL
-    )`)
-    .run(`CREATE TABLE IF NOT EXISTS reading (
+    )
+  `;
+
+  const readingTableQuery = `
+    CREATE TABLE IF NOT EXISTS reading (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       sensorname TEXT,
       temperature NUMERIC(10,2),
       pressure NUMERIC(10,2),
       humidity NUMERIC(10,2),
       FOREIGN KEY (sensorname) REFERENCES sensor(name)
-    )`, err => {
+    )
+  `;
+
+  db.run(sensorTableQuery)
+    .run(readingTableQuery, err => {
       if (err) {
         return console.log('Database initialization failed.', err);
       }
 
       console.log('Database up and running!');
     });
-
 };
 
 export { initializeDB };
@@ -187,3 +196,123 @@ const db = initializeDB();
 ```
 
 `npm start` luo nyt uuden tietokannan jos sellaista ei vielä ole olemassa.
+
+### 5. Tallennetaan vastaanotettu mitta-arvo kantaan
+
+Lisätään `dbUtils.ts`-tiedostoon mitta-arvon talletus -funkkari.
+
+```TypeScript
+...
+const insertReading = (reading: Reading) => {
+  const {
+    name: $name,
+    temperature: $temperature,
+    pressure: $pressure,
+    humidity: $humidity
+  } = reading;
+
+  const $timestamp = new Date().toISOString();
+
+  const insertSensorQuery = `
+    INSERT OR IGNORE INTO sensor (name, firstonline, lastonline)
+    VALUES ($name, $timestamp, $timestamp)
+  `;
+
+  const updateSensorQuery = `
+    UPDATE sensor
+    SET lastonline = $timestamp
+    WHERE name = $name
+  `;
+
+  const insertReadingQuery = `
+    INSERT INTO reading (sensorname, temperature, pressure, humidity)
+    VALUES ($name, $temperature, $pressure, $humidity)
+  `;
+
+  db.run(insertSensorQuery, { $name, $timestamp })
+    .run(updateSensorQuery, { $timestamp, $name })
+    .run(insertReadingQuery, { $name, $temperature, $pressure, $humidity }, err => {
+      if (err) {
+        return console.log('Error inserting a new reading', err);
+      }
+
+      console.log('Inserted new reading successfully');
+    });
+};
+
+export { initializeDB, insertReading };
+```
+
+Nyt uuden mitta-arvon lähettäminen päivittää sensor-tauluun sensorin online-ajankohdan
+ja puskee mitta-arvon reading-tauluun.
+
+### 6. Toteutetaan getsensors ja getreadings endpointit
+
+Lisätään `dbUtils.ts`-tiedostoon getSensors ja getReadings funktiot.
+
+```TypeScript
+...
+const getSensors = async () => {
+  const query = `
+    SELECT *
+    FROM sensor
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching sensors failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  })
+};
+
+const getReadings = async () => {
+  const query = `
+    SELECT sensorname, temperature, pressure, humidity
+    FROM reading
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching readings failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  });
+};
+
+export { initializeDB, insertReading, getSensors, getReadings };
+```
+
+Luodaan uudet endpointit `index.ts`-tiedostoon.
+
+```TypeScript
+...
+import { initializeDB, insertReading, getSensors, getReadings } from './dbUtils';
+...
+
+app.get('/api/getsensors', (req: Request, res: Response) => {
+  console.log('Received getsensors request');
+  getSensors()
+    .then(rows => res.send(rows))
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+});
+
+app.get('/api/getreadings', (req: Request, res: Response) => {
+  console.log('Received getreadings request');
+  getReadings()
+    .then(rows => res.send(rows))
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+});
+...
+```
+
+Tsekkaa nyt selaimella mitä löytyy osoitteista
+http://localhost:8080/api/getsensors ja http://localhost:8080/api/getreadings.
