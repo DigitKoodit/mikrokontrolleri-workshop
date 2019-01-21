@@ -1,7 +1,7 @@
 # IoT-workshop
 Koodikerhon mikrokontrolleri workshop jossa rakennellaan sääasema IoT-härpätin ja nettisivu, josta pääsee
 katselemaan kerättyä dataa. Alustana sääasemalle on ESP8266-mikrokontrolleri, joka ajaa Arduino-yhteensopivaa 
-C++–ohjelmointikielen kaltaista koodia, ja puskee keräämäänsä dataa JSON-muodossa HTTP POST -pyynnöllä serverille.
+C++–ohjelmointikieltä, ja puskee keräämäänsä dataa JSON-muodossa HTTP POST -pyynnöllä serverille.
 
 Backend on tehty Node.js, Express ja SQLite tekniikoilla. Frontend on toteutettu JavaScript ja React tekniikoilla.
 
@@ -24,13 +24,14 @@ nvm install 10
 nvm use 10
 ```
 
-Create-react-app asentuu kivasti NPM:llä:
+Yarn ja create-react-app asentuu kivasti NPM:llä:
 ```
-npm install --global create-react-app
+npm install --global yarn create-react-app
 ```
 
+Tämä on ainoa kerta kun workshopissa käytetään npm:ää, tästä eteenpäin pelkkää yarnia.
+
 ## Ohjeet
-### 1. Alusta Git-repositorio (vapaaehtoinen)
 
 **Disclaimer:** Gitin käyttäminen ei ole täysin pakollista, mutta erittäin suotavaa, koska se helpottaa ryhmätyön
 tekemistä huomattavasti.
@@ -40,12 +41,4 @@ tekemistä huomattavasti.
 README.md helppoa kloonausta varten.
 3. Kloonatkaa jokainen repo omalle koneelle.
 
-### 2. Rakenna IoT-härpätin
-
-![kytkentakaavio](https://github.com/DigitKoodit/mikrokontrolleri-workshop/blob/master/schematic.png)
-
-Kytkentöjä tehtäessä on hyvä ottaa virrat pois laitteista, ettei vahingossa oikosulkuun sohaistut komponentit päästä toimintasavuja pihalle. 
-
-Kytketään siis laudan 3.3V nasta (merkitty 3V3) sensorin Vin-nastaan ja ground-nastat toisiinsa. Näitä voi ajatella vastaavasti plus- ja miinusnapoina. Sitten kytketään D1 -> SCL ja D2 -> SDA.
-
-Sensori käyttää I2C-standardin väylää tiedonsiirtoon ja tämän laudan I2C-nastat ovat oletuksena D1 (SCL) ja D2 (SDA). Nämä voi vaihtaa minkä tahansa GPIO-nastojen kanssa, mikäli kokee tarpeelliseksi. Esimerkkiohjelma on tehty kuvassa näkyvällä kytkennällä.
+**[Mennään sularipuolen kimppuun!](embedded/)**
