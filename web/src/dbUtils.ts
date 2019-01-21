@@ -33,6 +33,7 @@ const initializeDB = () => {
 };
 
 const insertReading = (reading: Reading) => {
+  // dollar signs are required for SQL query templating
   const {
     name: $name,
     temperature: $temperature,

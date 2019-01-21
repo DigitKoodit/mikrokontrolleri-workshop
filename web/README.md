@@ -316,3 +316,12 @@ app.get('/api/getreadings', (req: Request, res: Response) => {
 
 Tsekkaa nyt selaimella mitä löytyy osoitteista
 http://localhost:8080/api/getsensors ja http://localhost:8080/api/getreadings.
+
+### 7. Luodaan frontend prokkikselle
+
+juokse `web` kansiossa:
+````
+create-react-app client --typescript
+````
+
+Siirry nyt frontin kimppuun eli avaa ////(linkki)////.
