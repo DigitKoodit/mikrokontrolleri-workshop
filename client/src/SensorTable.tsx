@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Table } from 'react-bootstrap';
 
 interface State {
   data: Sensor[]
@@ -17,7 +18,11 @@ class SensorTable extends Component<{}, State> {
 
   componentDidMount() {
     this.fetchSensors();
-    setInterval(this.fetchSensors, 3000); // 3 seconds
+    setInterval(this.fetchSensors.bind(this), 3000); // 3 seconds
+  }
+
+  formatDate(date: string): string {
+    return new Date(date).toLocaleString('fi-FI');
   }
 
   render() {
@@ -27,7 +32,28 @@ class SensorTable extends Component<{}, State> {
       return 'Ladataan...';
     }
 
-    return 'Data vastaanotettu!';
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>Nimi</th>
+            <th>Ensimmäinen viesti</th>
+            <th>Viimeisin viesti</th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          data.map(({ name, firstonline, lastonline }) => (
+            <tr key={name}>
+              <td>{name}</td>
+              <td>{this.formatDate(firstonline)}</td>
+              <td>{this.formatDate(lastonline)}</td>
+            </tr>
+          ))
+        }
+        </tbody>
+      </Table>
+    );
   }
 }
 

@@ -91,22 +91,22 @@ class SensorTable extends Component<{}, State> {
   async fetchSensors() {
     const response = await fetch('/api/getsensors');
     const data: Sensor[] = await response.json();
-    this.setState({ data })
+    this.setState({ data });
   }
 
   componentDidMount() {
     this.fetchSensors();
-    setInterval(this.fetchSensors, 3000); // 3 seconds
+    setInterval(this.fetchSensors.bind(this), 3000); // 3 seconds
   }
 
   render() {
     const { data } = this.state;
 
     if (data.length === 0) {
-      return 'Ladataan...'
+      return 'Ladataan...';
     }
 
-    return 'Data vastaanotettu!'
+    return 'Data vastaanotettu!';
   }
 }
 
@@ -115,5 +115,71 @@ export default SensorTable;
 ```
 
 Nyt komponentti hakee itselleen dataa rajapinnasta.
+
+### Toteutetaan sensoreiden listaus taulukkona
+
+Asennetaan react-bootstrap helpottamaan tyylittelyä.
+```
+yarn add react-bootstrap @types/react-bootstrap
+```
+
+Lisätään CSS-tyylien importtaus `index.html`-tiedostoon.
+```
+...
+    <title>React App</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    ...
+```
+
+Muoksitaan sisään tullut data siistiksi tauluksi.
+
+```TypeScript
+import React, { Component } from 'react'; 
+import { Table } from 'react-bootstrap';
+
+  ...
+
+  formatDate(date: string): string {
+    return new Date(date).toLocaleString('fi-FI');
+  }
+
+  render() {
+    const { data } = this.state;
+
+    if (data.length === 0) {
+      return 'Ladataan...';
+    }
+
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>Nimi</th>
+            <th>Ensimmäinen viesti</th>
+            <th>Viimeisin viesti</th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          data.map(({ name, firstonline, lastonline }) => (
+            <tr key={name}>
+              <td>{name}</td>
+              <td>{this.formatDate(firstonline)}</td>
+              <td>{this.formatDate(lastonline)}</td>
+            </tr>
+          ))
+        }
+        </tbody>
+      </Table>
+    );
+  }
+}
+```
+
+Nyt ruudulle piirtyy tosi siisti taulu.
 
 
