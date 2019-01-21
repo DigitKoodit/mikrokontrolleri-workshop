@@ -1,7 +1,7 @@
 
 # Etupää =D
 
-### Luodaan React-appis
+### 1. Luodaan React-appis
 
 Navigoi takaisin projektin juureen ja aja siellä:
 
@@ -17,7 +17,7 @@ Sinulla on nyt toimivan React-appiksen runko. Onnittelut!
 
 Create-react-app loi paljon tiedostoja mutta suurimmasta osasta ei tarvitse välittää.
 
-### Luodaan uusi SensorTable komponentti
+### 2. Luodaan uusi SensorTable komponentti
 
 Luodaan `SensorTable.tsx`-tiedosto:
 ```TypeScript
@@ -56,7 +56,7 @@ export default App;
 
 Nyt sovelluksen ulkonäkö muuttui! http://localhost:3000
 
-### Haetaan sensoreiden tiedot rajapinnasta
+### 3. Haetaan sensoreiden tiedot rajapinnasta
 
 Lisätään sensorin tyyppimäärittely `types.d.ts`-tiedostoon.
 ```TypeScript
@@ -116,7 +116,7 @@ export default SensorTable;
 
 Nyt komponentti hakee itselleen dataa rajapinnasta.
 
-### Toteutetaan sensoreiden listaus taulukkona
+### 4. Toteutetaan sensoreiden listaus taulukkona
 
 Asennetaan react-bootstrap helpottamaan tyylittelyä.
 ```
@@ -124,7 +124,7 @@ yarn add react-bootstrap @types/react-bootstrap
 ```
 
 Lisätään CSS-tyylien importtaus `index.html`-tiedostoon.
-```
+```html
 ...
     <title>React App</title>
     <!-- Latest compiled and minified CSS -->
@@ -182,4 +182,34 @@ import { Table } from 'react-bootstrap';
 
 Nyt ruudulle piirtyy tosi siisti taulu.
 
+### 5. Tyylitellään koko äppi kivammin react-bootstrapilla
 
+Lisätään `app.tsx`-tiedostoon react-bootstrap elementtejä.
+
+```TypeScript
+import React, { Component } from 'react';
+import { Grid, Row, Col, Panel } from 'react-bootstrap';
+
+import SensorTable from './SensorTable';
+
+class App extends Component {
+  render() {
+    return (
+      <Grid>
+        <Row>
+          <Col xs={12}>
+            <Panel>
+              <Panel.Heading>Sensorit</Panel.Heading>
+              <Panel.Body>
+                <SensorTable />
+              </Panel.Body>
+            </Panel>
+          </Col>
+        </Row>
+      </Grid>
+    );
+  }
+}
+
+export default App;
+```
