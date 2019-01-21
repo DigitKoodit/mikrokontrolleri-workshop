@@ -1,4 +1,4 @@
-const assertReading = (reading: Reading | null) => {
+const assertReading = (reading: NewReading | null) => {
   if (!reading) {
     throw 'Invalid request body';
   }

@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 initializeDB();
 
 app.post('/api/newreading', (req: Request, res: Response) => {
-  const reading: Reading = req.body;
+  const reading: NewReading = req.body;
   console.log('received new reading:', reading);
 
   try {

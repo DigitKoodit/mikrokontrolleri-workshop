@@ -78,7 +78,7 @@ Juokse `yarn start` ja palvelimen pitäisi nyt vastaanottaa tavaraa sääasemalt
 Luodaan `types.d.ts`-tiedosto datatyyppejä varten. Lisätään mitta-arvon tyyppi.
 
 ```
-interface Reading {
+interface NewReading {
   name: string,
   temperature: number,
   pressure: number,
@@ -90,7 +90,7 @@ Luodaan `util.ts`-tiedosto apufunktioita varten.
 Toteutetaan `assertReading-validointifunkkari sisään tulevien mitta-arvojen validointiin.
 
 ```TypeScript
-const assertReading = (reading: Reading | null) => {
+const assertReading = (reading: NewReading | null) => {
   if (!reading) {
     throw 'Invalid request body';
   }
@@ -123,16 +123,17 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/api/newreading', (req: Request, res: Response) => {
-  console.log('received new reading:', req.body);
+  const reading: NewReading = req.body;
+  console.log('received new reading:', reading);
 
   try {
-    assertReading(req.body);
+    assertReading(reading);
   }
   catch (error) {
     return res.status(400).send(error); // HTTP 400 Bad Request
   }
 
-  res.send(req.body);
+  res.send(reading);
 });
 ...
 ```
@@ -205,7 +206,7 @@ Lisätään `dbUtils.ts`-tiedostoon mitta-arvon talletus -funkkari.
 
 ```TypeScript
 ...
-const insertReading = (reading: Reading) => {
+const insertReading = (reading: NewReading) => {
   const {
     name: $name,
     temperature: $temperature,
@@ -250,11 +251,29 @@ ja puskee mitta-arvon reading-tauluun.
 
 ### 6. Toteutetaan getsensors ja getreadings endpointit
 
+Lisätään `types.d.ts`-tiedostoon Sensor ja Reading tyyppimäärittelyt.
+
+```TypeScript
+...
+interface Sensor {
+  name: string,
+  firstonline: string,
+  lastonline: string
+}
+
+interface Reading {
+  sensorname: string,
+  temperature: number,
+  pressure: number,
+  humidity: number
+}
+```
+
 Lisätään `dbUtils.ts`-tiedostoon getSensors ja getReadings funktiot.
 
 ```TypeScript
 ...
-const getSensors = async () => {
+const getSensors = async (): Promise<Sensor[]> => {
   const query = `
     SELECT *
     FROM sensor
@@ -272,7 +291,7 @@ const getSensors = async () => {
   })
 };
 
-const getReadings = async () => {
+const getReadings = async (): Promise<Reading[]> => {
   const query = `
     SELECT sensorname, temperature, pressure, humidity
     FROM reading

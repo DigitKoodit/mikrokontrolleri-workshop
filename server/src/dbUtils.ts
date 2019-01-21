@@ -32,7 +32,7 @@ const initializeDB = () => {
     });
 };
 
-const insertReading = (reading: Reading) => {
+const insertReading = (reading: NewReading) => {
   // dollar signs are required for SQL query templating
   const {
     name: $name,
@@ -70,7 +70,7 @@ const insertReading = (reading: Reading) => {
     });
 };
 
-const getSensors = async () => {
+const getSensors = async (): Promise<Sensor[]> => {
   const query = `
     SELECT *
     FROM sensor
@@ -88,7 +88,7 @@ const getSensors = async () => {
   })
 };
 
-const getReadings = async () => {
+const getReadings = async (): Promise<Reading[]> => {
   const query = `
     SELECT sensorname, temperature, pressure, humidity
     FROM reading
