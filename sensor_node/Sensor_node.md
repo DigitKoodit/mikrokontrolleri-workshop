@@ -1,4 +1,4 @@
-#IoT-Workshop ESP-ohje
+# IoT-Workshop ESP-ohje
 Ohje ESP8266 -mikrokontrollerin käyttöönottoon ja ohjelmointiin.
 
 ## Kertauksena:
@@ -6,7 +6,7 @@ Ohje ESP8266 -mikrokontrollerin käyttöönottoon ja ohjelmointiin.
 
 Seuraa näitä ohjeita: [////(Linkki)////](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/).
 
-Käytetään Board-asetuksena **LOLIN(WEMOS) D1 R2 & mini** ja Upload speed -asetuksena 115200.
+Käytetään Board-asetuksena **LOLIN(WEMOS) D1 R2 & mini**.
 
 
 ## Kirjastot
@@ -17,4 +17,21 @@ Tähän työhön vaadittavat kirjastot ovat seuraavassa listassa mielivaltaisess
 
 * Adafruit BME280 Library
 * ArduinoJson (HUOM! Version 6 julkaisut ovat vielä kokeellisia, joten käytämme versiota 5.13.4)
-* 
+* Adafruit unified sensor (BME280-sensorikirjasto vaatii tämän toimiakseen)
+
+Kirjastoja saadaan käyttöön kirjoittamalla seuraavanlaisia rivejä tiedoston alkuun:
+``` 
+#include <kirjasto.h>
+```
+
+Tai Arduino IDE:n Sketch -valikosta valitsemalla Include library. Mikäli valitsemaasi kirjastoa ei löydy valikosta, klikkaa listan yläreunasta Manage Libraries ja etsi puuttuvat kirjastot käsin.
+
+Projektimme includet näyttävät siis suunnilleen tältä:
+```
+#include <ArduinoJson.h>
+#include <ESP8266WiFiMulti.h>
+#include <ESP8266HTTPClient.h>
+#include <Adafruit_BME280.h>
+#include <Wire.h>
+```
+
