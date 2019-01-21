@@ -20,7 +20,7 @@ Lisää `tsconfig.json`-tiedostoon lib ja outDir-kentät:
 {
   "compilerOptions": {
     ...
-    "lib": ["es2015"],
+    "lib": ["esnext"],
     "outDir": "./build",
     ...
 ```
