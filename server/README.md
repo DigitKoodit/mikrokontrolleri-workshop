@@ -6,12 +6,12 @@ Navigoi projektin kansioon ja juoke siellä seuraava komento, joka alustaa TypeS
 ```shell
 mkdir server
 cd server
-npm init -y
+yarn init -y
 ```
 
 Asenna TypeScript ja alusta TypeScript-projekti:
 ```shell
-npm install --save-dev typescript
+yarn add --dev typescript
 tsc --init
 ```
 
@@ -27,10 +27,12 @@ Lisää `tsconfig.json`-tiedostoon lib ja outDir-kentät:
 
 Aseta package.json tiedostoon build- ja start-komennot:
 ```
+...
 "scripts": {
   "build": "tsc -p tsconfig.json",
-  "start": "npm run build && node ./build",
-  ...
+  "start": "yarn build && node ./build"
+}
+...
 ```
 
 Luo `src/index.ts`-tiedosto:
@@ -40,13 +42,13 @@ console.log('Helou Koodi- ja Eltykerho!');
 
 Lisää `.gitignore`-tiedostoon `build/`-kansio.
 
-Juokse `npm start` ja katso mitä tapahtuu!
+Juokse `yarn start` ja katso mitä tapahtuu!
 
 ### 2. Express-bäkkärin pystyttely
 
 Asenna depsut eli express ja body-parser, sekä niiden tyyppitiedostot:
 ```shell
-npm install --save express body-parser @types/express @types/body-parser
+yarn add express body-parser @types/express @types/body-parser
 ```
 
 Tee `index.ts`-tiedostoon yksinkertainen express-päätepiste (eng. endpoint).
@@ -63,13 +65,13 @@ app.post('/api/newreading', (req: Request, res: Response) => {
 });
 
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 ```
 
-Juokse `npm start` ja palvelimen pitäisi nyt vastaanottaa tavaraa sääasemalta.
+Juokse `yarn start` ja palvelimen pitäisi nyt vastaanottaa tavaraa sääasemalta.
 
 ### 3. Validoidaan sää asemalta tuleva data
 
@@ -135,14 +137,14 @@ app.post('/api/newreading', (req: Request, res: Response) => {
 ...
 ```
 
-Käynnistä palvelin uudelleen: `npm start`.
+Käynnistä palvelin uudelleen: `yarn start`.
 Nyt virheellisen datan lähettäminen palvelimelle heittää `HTTP 400 Bad Request`-virheilmoituksen.
 
 ### 4. SQLite tietokannan rakentelu
 
 Asennetaan SQLite ja lisätään se dependensseihin.
 ```
-npm install --save sqlite3 @types/sqlite3
+yarn add sqlite3 @types/sqlite3
 ```
 
 Luodaan `dbUtils.ts`-tiedosto kannan kanssa painimista varten.
@@ -195,7 +197,7 @@ const db = initializeDB();
 ...
 ```
 
-`npm start` luo nyt uuden tietokannan jos sellaista ei vielä ole olemassa.
+`yarn start` luo nyt uuden tietokannan jos sellaista ei vielä ole olemassa.
 
 ### 5. Tallennetaan vastaanotettu mitta-arvo kantaan
 
@@ -315,13 +317,6 @@ app.get('/api/getreadings', (req: Request, res: Response) => {
 ```
 
 Tsekkaa nyt selaimella mitä löytyy osoitteista
-http://localhost:8080/api/getsensors ja http://localhost:8080/api/getreadings.
+http://localhost:3001/api/getsensors ja http://localhost:3001/api/getreadings.
 
-### 7. Luodaan frontend prokkikselle
-
-juokse `web` kansiossa:
-````
-create-react-app client --typescript
-````
-
-Siirry nyt frontin kimppuun eli avaa ////(linkki)////.
+**Siirrytään frontendin kimppuun!**

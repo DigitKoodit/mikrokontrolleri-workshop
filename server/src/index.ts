@@ -38,7 +38,7 @@ app.get('/api/getreadings', (req: Request, res: Response) => {
     .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
 });
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
