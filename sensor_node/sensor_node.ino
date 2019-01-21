@@ -22,7 +22,7 @@ ESP8266WiFiMulti WiFiMulti;
 Adafruit_BME280 bme;
 
 // Initialize json document
-const int capacity = JSON_OBJECT_SIZE(8);
+const int capacity = JSON_OBJECT_SIZE(4);
 
 
 void setup() {
