@@ -15,12 +15,14 @@ npm install --save-dev typescript
 tsc --init
 ```
 
-Lisää `tsconfig.json`-tiedostoon outDir-asetus:
+Lisää `tsconfig.json`-tiedostoon lib ja outDir-kentät:
 ```
 {
   "compilerOptions": {
     ...
+    "lib": ["es2015"],
     "outDir": "./build",
+    ...
 ```
 
 Aseta package.json tiedostoon build- ja start-komennot:
@@ -55,7 +57,7 @@ import bodyParser from 'body-parser';
 const app = express();
 app.use(bodyParser.json());
 
-app.post('/newreading', (req: Request, res: Response) => {
+app.post('/api/newreading', (req: Request, res: Response) => {
   console.log('received new reading:', req.body);
   res.send(req.body);
 });
@@ -118,14 +120,14 @@ import { assertReading } from './util';
 const app = express();
 app.use(bodyParser.json());
 
-app.post('/newreading', (req: Request, res: Response) => {
+app.post('/api/newreading', (req: Request, res: Response) => {
   console.log('received new reading:', req.body);
 
   try {
     assertReading(req.body);
   }
   catch (error) {
-    return res.status(400).send(error);
+    return res.status(400).send(error); // HTTP 400 Bad Request
   }
 
   res.send(req.body);
@@ -244,3 +246,73 @@ export { initializeDB, insertReading };
 Nyt uuden mitta-arvon lähettäminen päivittää sensor-tauluun sensorin online-ajankohdan
 ja puskee mitta-arvon reading-tauluun.
 
+### 6. Toteutetaan getsensors ja getreadings endpointit
+
+Lisätään `dbUtils.ts`-tiedostoon getSensors ja getReadings funktiot.
+
+```TypeScript
+...
+const getSensors = async () => {
+  const query = `
+    SELECT *
+    FROM sensor
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching sensors failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  })
+};
+
+const getReadings = async () => {
+  const query = `
+    SELECT sensorname, temperature, pressure, humidity
+    FROM reading
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching readings failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  });
+};
+
+export { initializeDB, insertReading, getSensors, getReadings };
+```
+
+Luodaan uudet endpointit `index.ts`-tiedostoon.
+
+```TypeScript
+...
+import { initializeDB, insertReading, getSensors, getReadings } from './dbUtils';
+...
+
+app.get('/api/getsensors', (req: Request, res: Response) => {
+  console.log('Received getsensors request');
+  getSensors()
+    .then(rows => res.send(rows))
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+});
+
+app.get('/api/getreadings', (req: Request, res: Response) => {
+  console.log('Received getreadings request');
+  getReadings()
+    .then(rows => res.send(rows))
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+});
+...
+```
+
+Tsekkaa nyt selaimella mitä löytyy osoitteista
+http://localhost:8080/api/getsensors ja http://localhost:8080/api/getreadings.

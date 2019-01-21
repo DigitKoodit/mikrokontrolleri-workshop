@@ -69,4 +69,40 @@ const insertReading = (reading: Reading) => {
     });
 };
 
-export { initializeDB, insertReading };
+const getSensors = async () => {
+  const query = `
+    SELECT *
+    FROM sensor
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching sensors failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  })
+};
+
+const getReadings = async () => {
+  const query = `
+    SELECT sensorname, temperature, pressure, humidity
+    FROM reading
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.log('Fetching readings failed', err);
+        reject(err);
+      }
+
+      resolve(rows);
+    })
+  });
+};
+
+export { initializeDB, insertReading, getSensors, getReadings };
