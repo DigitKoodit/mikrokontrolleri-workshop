@@ -1,11 +1,8 @@
-# IoT-workshop
-Koodikerhon mikrokontrolleri workshop jossa rakennellaan sääasema IoT-härpätin ja nettisivu, josta pääsee
-katselemaan kerättyä dataa. Alustana sääasemalle on ESP8266-mikrokontrolleri, joka ajaa Arduino-yhteensopivaa 
-C++–ohjelmointikielen kaltaista koodia, ja puskee keräämäänsä dataa JSON-muodossa HTTP POST -pyynnöllä serverille.
+# IoT-workshop ESP-ohje
+Workshopin sularipuolen README
 
-Backend on tehty Node.js, Express ja SQLite tekniikoilla. Frontend on toteutettu JavaScript ja React tekniikoilla.
-
-## Esivaatimukset
+## Kertausta:
+Jos teit jo nämä, hyppää kohtaan Kirjastot
 
 ### 1. Asenna Arduino IDE ja ESP8266-lisäri
 
