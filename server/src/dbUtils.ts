@@ -30,7 +30,6 @@ const initializeDB = () => {
 
       console.log('Database up and running!');
     });
-
 };
 
 const insertReading = (reading: Reading) => {

@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 
 import { assertReading } from './util';
-import {initializeDB, insertReading} from './dbUtils';
+import { initializeDB, insertReading } from './dbUtils';
 
 const app = express();
 app.use(bodyParser.json());
