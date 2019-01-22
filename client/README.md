@@ -213,3 +213,9 @@ class App extends Component {
 
 export default App;
 ```
+
+### 6. Luodaan mitta-arvoille kuvaajat
+
+Koodataan uusi komponentti `ReadingGraphs.tsx`.
+
+

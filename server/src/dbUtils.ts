@@ -89,74 +89,22 @@ const getSensors = async (): Promise<Sensor[]> => {
   })
 };
 
-// TODO: Update README
-const getReadings = async (): Promise<FormattedReadings> => {
+const getReadings = async (): Promise<Reading[]> => {
   const query = `
     SELECT sensorname, temperature, pressure, humidity, timestamp
     FROM reading
   `;
 
   return new Promise((resolve, reject) => {
-    db.all(query, (err, rows: Reading[]) => {
+    db.all(query, (err, rows) => {
       if (err) {
         console.log('Fetching readings failed', err);
         reject(err);
       }
 
-      const result = rows.reduce(formatReading, {
-        temperature: [],
-        pressure: [],
-        humidity: []
-      });
-
-      resolve(result);
+      resolve(rows);
     })
-  });
-};
-
-const formatReading = (acc: FormattedReadings, reading: Reading): FormattedReadings => {
-  return {
-    temperature: addNewReading(acc.temperature, reading, 'temperature'),
-    pressure: addNewReading(acc.pressure, reading, 'pressure'),
-    humidity: addNewReading(acc.humidity, reading, 'pressure')
-  }
-};
-
-// TODO: refactor to not look like ass
-const addNewReading = (prevReadings: ReadingsForProperty[],
-                       reading: Reading,
-                       property: 'temperature' | 'pressure' | 'humidity'): ReadingsForProperty[] => {
-  if (prevReadings.some(r => r.sensorname === reading.sensorname)) {
-    return prevReadings.map(oldReading => {
-      if (oldReading.sensorname === reading.sensorname) {
-        return {
-          ...oldReading,
-          readings: [
-            ...oldReading.readings,
-            {
-              timestamp: reading.timestamp,
-              value: reading[property]
-            }
-          ]
-        } as ReadingsForProperty
-      }
-      else {
-        return oldReading
-      }
-    })
-  }
-  else {
-    return [
-      ...prevReadings,
-      {
-        sensorname: reading.sensorname,
-        readings: [{
-          timestamp: reading.timestamp,
-          value: reading[property]
-        }]
-      }
-    ]
-  }
+  })
 };
 
 export { initializeDB, insertReading, getSensors, getReadings };
