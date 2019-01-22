@@ -1,6 +1,8 @@
 # IoT-workshop ESP-ohje
 Workshopin sularipuolen README
 
+Hakemistosta iot-workshop löytyy Arduino-koodi, jota täydennetään workshopin edetessä.
+
 ## Kertausta:
 Jos teit jo nämä, hyppää kohtaan Kirjastot
 
