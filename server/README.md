@@ -270,6 +270,7 @@ interface Reading {
 ```
 
 Lisätään `dbUtils.ts`-tiedostoon getSensors ja getReadings funktiot.
+// TODO: update after refactoring getReadings
 
 ```TypeScript
 ...
