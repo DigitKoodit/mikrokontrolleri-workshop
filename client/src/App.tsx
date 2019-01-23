@@ -11,7 +11,9 @@ class App extends Component {
         <Row>
           <Col xs={12}>
             <Panel className={"mb-4"}>
-              <Panel.Heading>Sensorit</Panel.Heading>
+              <Panel.Heading>
+                <h4>Sensorit</h4>
+              </Panel.Heading>
               <Panel.Body>
                 <SensorTable />
               </Panel.Body>
@@ -19,7 +21,9 @@ class App extends Component {
           </Col>
           <Col xs={12}>
             <Panel className={"mb-4"}>
-              <Panel.Heading>Mittaukset</Panel.Heading>
+              <Panel.Heading>
+                <h4>Mittaukset</h4>
+              </Panel.Heading>
               <Panel.Body>
                 <ReadingTable />
               </Panel.Body>
