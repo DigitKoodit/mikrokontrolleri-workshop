@@ -5,6 +5,7 @@ import SensorTable from './SensorTable';
 import ReadingTable from './ReadingTable';
 
 class App extends Component {
+  // TODO: don't crash if api calls fail
   render() {
     return (
       <Grid>
