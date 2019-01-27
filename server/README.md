@@ -59,6 +59,10 @@ import bodyParser from 'body-parser';
 const app = express();
 app.use(bodyParser.json());
 
+/**
+ * POST /api/newreading
+ * Send a new reading from the sensor to the server.
+ */
 app.post('/api/newreading', (req: Request, res: Response) => {
   console.log('received new reading:', req.body);
   res.send(req.body);
@@ -122,6 +126,10 @@ import { assertReading } from './util';
 const app = express();
 app.use(bodyParser.json());
 
+/**
+ * POST /api/newreading
+ * Send a new reading from the sensor to the server.
+ */
 app.post('/api/newreading', (req: Request, res: Response) => {
   const reading: NewReading = req.body;
   console.log('received new reading:', reading);
@@ -145,15 +153,18 @@ Nyt virheellisen datan lähettäminen palvelimelle heittää `HTTP 400 Bad Reque
 
 Asennetaan SQLite ja lisätään se dependensseihin.
 ```
-yarn add sqlite3 @types/sqlite3
+yarn add better-sqlite3 @types/better-sqlite3
 ```
 
 Luodaan `dbUtils.ts`-tiedosto kannan kanssa painimista varten.
 ```TypeScript
-import sqlite3 from 'sqlite3';
+import Database from 'better-sqlite3';
 
-const db = new sqlite3.Database('database.db');
+const db = new Database('database.db');
 
+/**
+ *  Create tables for sensors and readings if none exist in the database.
+ */
 const initializeDB = () => {
   const sensorTableQuery = `
     CREATE TABLE IF NOT EXISTS sensor (
@@ -174,14 +185,11 @@ const initializeDB = () => {
     )
   `;
 
-  db.run(sensorTableQuery)
-    .run(readingTableQuery, err => {
-      if (err) {
-        return console.log('Database initialization failed.', err);
-      }
+  db.prepare(sensorTableQuery)
+    .run();
 
-      console.log('Database up and running!');
-    });
+  db.prepare(readingTableQuery)
+    .run();
 };
 
 export { initializeDB };
@@ -194,7 +202,7 @@ import { initializeDB } from './dbUtils';
 
 const app = express();
 app.use(bodyParser.json());
-const db = initializeDB();
+initializeDB();
 ...
 ```
 
@@ -205,42 +213,43 @@ const db = initializeDB();
 Lisätään `dbUtils.ts`-tiedostoon mitta-arvon talletus -funkkari.
 
 ```TypeScript
-...
+/**
+ *  Insert a reading into the table 'reading'
+ *  and update 'sensor' table
+ */
 const insertReading = (reading: NewReading) => {
-  const {
-    name: $name,
-    temperature: $temperature,
-    pressure: $pressure,
-    humidity: $humidity
-  } = reading;
+  const insertData = {
+    timestamp: new Date().toISOString(),
+    ...reading,
+  };
 
-  const $timestamp = new Date().toISOString();
-
+  // If the sensor is not in the 'sensor' table insert it
   const insertSensorQuery = `
     INSERT OR IGNORE INTO sensor (name, firstonline, lastonline)
     VALUES ($name, $timestamp, $timestamp)
   `;
 
+  // update the sensor's last online time
   const updateSensorQuery = `
     UPDATE sensor
     SET lastonline = $timestamp
     WHERE name = $name
   `;
 
+  // insert a reading into the table 'reading'
   const insertReadingQuery = `
-    INSERT INTO reading (sensorname, temperature, pressure, humidity)
-    VALUES ($name, $temperature, $pressure, $humidity)
+    INSERT INTO reading (sensorname, temperature, pressure, humidity, timestamp)
+    VALUES ($name, $temperature, $pressure, $humidity, $timestamp)
   `;
 
-  db.run(insertSensorQuery, { $name, $timestamp })
-    .run(updateSensorQuery, { $timestamp, $name })
-    .run(insertReadingQuery, { $name, $temperature, $pressure, $humidity }, err => {
-      if (err) {
-        return console.log('Error inserting a new reading', err);
-      }
+  db.prepare(insertSensorQuery)
+    .run(insertData);
 
-      console.log('Inserted new reading successfully');
-    });
+  db.prepare(updateSensorQuery)
+    .run(insertData);
+
+  db.prepare(insertReadingQuery)
+    .run(insertData);
 };
 
 export { initializeDB, insertReading };
@@ -274,40 +283,30 @@ Lisätään `dbUtils.ts`-tiedostoon getData-funktio.
 
 ```TypeScript
 ...
-const getSensors = async (): Promise<Sensor[]> => {
+/**
+ *  Get sensor data from the database
+ */
+const getSensors = (): Sensor[] => {
   const query = `
     SELECT *
     FROM sensor
   `;
 
-  return new Promise((resolve, reject) => {
-    db.all(query, (err, rows) => {
-      if (err) {
-        console.log('Fetching sensors failed', err);
-        reject(err);
-      }
-
-      resolve(rows);
-    })
-  })
+  return db.prepare(query)
+    .all();
 };
 
-const getReadings = async (): Promise<Reading[]> => {
+/**
+ *  Get readings data from the database
+ */
+const getReadings = (): Reading[] => {
   const query = `
-    SELECT sensorname, temperature, pressure, humidity
+    SELECT sensorname, temperature, pressure, humidity, timestamp
     FROM reading
   `;
 
-  return new Promise((resolve, reject) => {
-    db.all(query, (err, rows) => {
-      if (err) {
-        console.log('Fetching readings failed', err);
-        reject(err);
-      }
-
-      resolve(rows);
-    })
-  });
+  return db.prepare(query)
+    .all();
 };
 
 export { initializeDB, insertReading, getSensors, getReadings };
@@ -320,19 +319,24 @@ Luodaan uudet endpointit `index.ts`-tiedostoon.
 import { initializeDB, insertReading, getSensors, getReadings } from './dbUtils';
 ...
 
+/**
+ * GET /api/getsensors
+ * List sensor data.
+ */
 app.get('/api/getsensors', (req: Request, res: Response) => {
   console.log('Received getsensors request');
-  getSensors()
-    .then(rows => res.send(rows))
-    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+  res.send(getSensors());
 });
 
+/**
+ * GET /api/getreadings
+ * List reading data.
+ */
 app.get('/api/getreadings', (req: Request, res: Response) => {
   console.log('Received getreadings request');
-  getReadings()
-    .then(rows => res.send(rows))
-    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+  res.send(getReadings());
 });
+
 ...
 ```
 

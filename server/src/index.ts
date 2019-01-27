@@ -8,10 +8,15 @@ const app = express();
 app.use(bodyParser.json());
 initializeDB();
 
+/**
+ * POST /api/newreading
+ * Send a new reading from the sensor to the server.
+ */
 app.post('/api/newreading', (req: Request, res: Response) => {
   const reading: NewReading = req.body;
   console.log('received new reading:', reading);
 
+  // TODO: switch to TypeScript type guard
   try {
     assertReading(reading);
   }
@@ -24,18 +29,22 @@ app.post('/api/newreading', (req: Request, res: Response) => {
   res.send(reading);
 });
 
+/**
+ * GET /api/getsensors
+ * List sensor data.
+ */
 app.get('/api/getsensors', (req: Request, res: Response) => {
   console.log('Received getsensors request');
-  getSensors()
-    .then(rows => res.send(rows))
-    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+  res.send(getSensors());
 });
 
+/**
+ * GET /api/getreadings
+ * List reading data.
+ */
 app.get('/api/getreadings', (req: Request, res: Response) => {
   console.log('Received getreadings request');
-  getReadings()
-    .then(rows => res.send(rows))
-    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+  res.send(getReadings());
 });
 
 const port = process.env.PORT || 3001;
