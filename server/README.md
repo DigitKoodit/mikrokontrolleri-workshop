@@ -151,113 +151,120 @@ Nyt virheellisen datan lähettäminen palvelimelle heittää `HTTP 400 Bad Reque
 
 ### 4. SQLite tietokannan rakentelu
 
-Asennetaan SQLite ja lisätään se dependensseihin.
+Asennetaan SQLite ja sql-template-strings js lisätään ne dependensseihin.
 ```
-yarn add better-sqlite3 @types/better-sqlite3
+yarn add sqlite sql-template-strings
 ```
 
-Luodaan `dbUtils.ts`-tiedosto kannan kanssa painimista varten.
+Luodaan `migrations/001-initial-schema.sql`-tiedosto, joka alustaa kaksi taulua tietokantaan.
+```SQL
+-- Up
+CREATE TABLE Sensor (
+  name TEXT PRIMARY KEY,
+  firstonline TEXT NOT NULL,
+  lastonline TEXT NOT NULL
+);
+CREATE TABLE Reading (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  sensorname TEXT,
+  temperature NUMERIC(10,2),
+  pressure NUMERIC(10,2),
+  humidity NUMERIC(10,2),
+  timestamp TEXT,
+  FOREIGN KEY (sensorname) REFERENCES sensor(name)
+);
+
+-- Down
+DROP TABLE Sensor;
+DROP TABLE Reading;
+```
+
+Luodaan `src/dbUtils.ts`-tiedosto kannan kanssa painimista varten.
 ```TypeScript
-import Database from 'better-sqlite3';
+import sqlite from 'sqlite';
 
-const db = new Database('database.db');
-
-/**
- *  Create tables for sensors and readings if none exist in the database.
- */
-const initializeDB = () => {
-  const sensorTableQuery = `
-    CREATE TABLE IF NOT EXISTS sensor (
-      name TEXT PRIMARY KEY,
-      firstonline TEXT NOT NULL,
-      lastonline TEXT NOT NULL
-    )
-  `;
-
-  const readingTableQuery = `
-    CREATE TABLE IF NOT EXISTS reading (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sensorname TEXT,
-      temperature NUMERIC(10,2),
-      pressure NUMERIC(10,2),
-      humidity NUMERIC(10,2),
-      FOREIGN KEY (sensorname) REFERENCES sensor(name)
-    )
-  `;
-
-  db.prepare(sensorTableQuery)
-    .run();
-
-  db.prepare(readingTableQuery)
-    .run();
-};
-
-export { initializeDB };
+// initialize database
+const dbPromise = Promise.resolve()
+  .then(() => sqlite.open('database.db'))
+  .then(db => db.migrate({ force: 'last' }));
 ```
 
-Lisätään `index.ts`-tiedostoon kutsu kannan alustus -funkkariin.
+### 5. Talletetaan uusi mitta-arvo kantaan
+
+Lisätään `dbUtils.ts`-tiedostoon insertReading-funkkari.
+
 ```TypeScript
+import sqlite from 'sqlite';
+import SQL from 'sql-template-strings';
+
 ...
-import { initializeDB } from './dbUtils';
 
-const app = express();
-app.use(bodyParser.json());
-initializeDB();
-...
-```
-
-`yarn start` luo nyt uuden tietokannan jos sellaista ei vielä ole olemassa.
-
-### 5. Tallennetaan vastaanotettu mitta-arvo kantaan
-
-Lisätään `dbUtils.ts`-tiedostoon mitta-arvon talletus -funkkari.
-
-```TypeScript
 /**
  *  Insert a reading into the table 'reading'
  *  and update 'sensor' table
  */
-const insertReading = (reading: NewReading) => {
-  const insertData = {
-    timestamp: new Date().toISOString(),
-    ...reading,
-  };
+const insertReading = (reading: NewReading): Promise<void> => {
+  const { name, temperature, pressure, humidity } = reading;
+  const timestamp = new Date().toISOString();
 
   // If the sensor is not in the 'sensor' table insert it
-  const insertSensorQuery = `
+  const insertSensorQuery = SQL`
     INSERT OR IGNORE INTO sensor (name, firstonline, lastonline)
-    VALUES ($name, $timestamp, $timestamp)
+    VALUES (${name}, ${timestamp}, ${timestamp})
   `;
 
   // update the sensor's last online time
-  const updateSensorQuery = `
+  const updateSensorQuery = SQL`
     UPDATE sensor
-    SET lastonline = $timestamp
-    WHERE name = $name
+    SET lastonline = ${timestamp} WHERE name = ${name}
   `;
 
   // insert a reading into the table 'reading'
-  const insertReadingQuery = `
+  const insertReadingQuery = SQL`
     INSERT INTO reading (sensorname, temperature, pressure, humidity, timestamp)
-    VALUES ($name, $temperature, $pressure, $humidity, $timestamp)
+    VALUES (${name}, ${temperature}, ${pressure}, ${humidity}, ${timestamp})
   `;
 
-  db.prepare(insertSensorQuery)
-    .run(insertData);
-
-  db.prepare(updateSensorQuery)
-    .run(insertData);
-
-  db.prepare(insertReadingQuery)
-    .run(insertData);
+  return dbPromise
+    .then(db => Promise.all([
+      db.run(insertSensorQuery),
+      db.run(updateSensorQuery),
+      db.run(insertReadingQuery)
+    ]))
+    .then(() => console.log('Successfully inserted reading into database.'));
 };
-
-export { initializeDB, insertReading };
 ```
 
-Nyt uuden mitta-arvon lähettäminen päivittää sensor-tauluun sensorin online-ajankohdan
-ja puskee mitta-arvon reading-tauluun.
+Lisätään `index.ts`-tiedostoon funktiokutsu mitta-arvon tallettamiseen.
+```TypeScript
+...
+import { insertReading } from './dbUtils';
 
+...
+
+/**
+ * POST /api/newreading
+ * Send a new reading from the sensor to the server.
+ */
+app.post('/api/newreading', (req: Request, res: Response) => {
+  const reading: NewReading = req.body;
+  console.log('received new reading:', reading);
+
+  // TODO: switch to TypeScript type guard
+  try {
+    assertReading(reading);
+  }
+  catch (error) {
+    return res.status(400).send(error); // HTTP 400 Bad Request
+  }
+
+  insertReading(reading)
+    .then(() => res.send(reading))
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
+});
+```
+
+// TODO: Päivitä tästä eteenpäin
 ### 6. Toteutetaan getsensors ja getreadings endpointit
 
 Lisätään `types.d.ts`-tiedostoon Sensor ja Reading tyyppimäärittelyt.
@@ -278,8 +285,7 @@ interface Reading {
 }
 ```
 
-// TODO:
-Lisätään `dbUtils.ts`-tiedostoon getData-funktio.
+
 
 ```TypeScript
 ...
