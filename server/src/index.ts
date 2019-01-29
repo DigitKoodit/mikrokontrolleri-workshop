@@ -43,9 +43,9 @@ app.get('/api/getsensors', (req: Request, res: Response) => {
  * GET /api/getreadings
  * List reading data.
  */
-app.get('/api/getreadings', (req: Request, res: Response) => {
+app.get('/api/getreadings/:noOfReadings', (req: Request, res: Response) => {
   console.log('Received getreadings request');
-  getReadings()
+  getReadings(req.params.noOfReadings)
     .then(readings => res.send(readings))
     .catch(error => res.status(500).send(error)); // HTTP 500 Internal Server error
 });
