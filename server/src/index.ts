@@ -2,11 +2,10 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 
 import { assertReading } from './util';
-import { initializeDB, insertReading, getSensors, getReadings } from './dbUtils';
+import { insertReading, getSensors, getReadings } from './dbUtils';
 
 const app = express();
 app.use(bodyParser.json());
-initializeDB();
 
 /**
  * POST /api/newreading
@@ -24,9 +23,9 @@ app.post('/api/newreading', (req: Request, res: Response) => {
     return res.status(400).send(error); // HTTP 400 Bad Request
   }
 
-  insertReading(reading);
-
-  res.send(reading);
+  insertReading(reading)
+    .then(() => res.send(reading))
+    .catch(err => res.status(500).send(err));
 });
 
 /**
@@ -35,7 +34,9 @@ app.post('/api/newreading', (req: Request, res: Response) => {
  */
 app.get('/api/getsensors', (req: Request, res: Response) => {
   console.log('Received getsensors request');
-  res.send(getSensors());
+  getSensors()
+    .then(sensors => res.send(sensors))
+    .catch(err => res.status(500).send(err));
 });
 
 /**
@@ -44,7 +45,9 @@ app.get('/api/getsensors', (req: Request, res: Response) => {
  */
 app.get('/api/getreadings', (req: Request, res: Response) => {
   console.log('Received getreadings request');
-  res.send(getReadings());
+  getReadings()
+    .then(readings => res.send(readings))
+    .catch(error => res.status(500).send(error)); // HTTP 500 Internal Server error
 });
 
 const port = process.env.PORT || 3001;

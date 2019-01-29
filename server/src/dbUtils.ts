@@ -1,101 +1,71 @@
-import Database from 'better-sqlite3';
+import sqlite from 'sqlite';
+import SQL from 'sql-template-strings';
 
-const db = Database('database.db');
-
-/**
- *  Create tables for sensors and readings if none exist in the database.
- */
-const initializeDB = () => {
-  const sensorTableQuery = `
-    CREATE TABLE IF NOT EXISTS sensor (
-      name TEXT PRIMARY KEY,
-      firstonline TEXT NOT NULL,
-      lastonline TEXT NOT NULL
-    )
-  `;
-
-  const readingTableQuery = `
-    CREATE TABLE IF NOT EXISTS reading (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sensorname TEXT,
-      temperature NUMERIC(10,2),
-      pressure NUMERIC(10,2),
-      humidity NUMERIC(10,2),
-      timestamp TEXT,
-      FOREIGN KEY (sensorname) REFERENCES sensor(name)
-    )
-  `;
-
-  db.prepare(sensorTableQuery)
-    .run();
-
-  db.prepare(readingTableQuery)
-    .run();
-};
+// initialize database
+const dbPromise = Promise.resolve()
+  .then(() => sqlite.open('database.db'))
+  .then(db => db.migrate({ force: 'last' }));
 
 /**
  *  Insert a reading into the table 'reading'
  *  and update 'sensor' table
  */
-const insertReading = (reading: NewReading) => {
-  const insertData = {
-    timestamp: new Date().toISOString(),
-    ...reading,
-  };
+const insertReading = (reading: NewReading): Promise<void> => {
+  const { name, temperature, pressure, humidity } = reading;
+  const timestamp = new Date().toISOString();
+  console.log(reading, timestamp)
 
   // If the sensor is not in the 'sensor' table insert it
-  const insertSensorQuery = `
+  const insertSensorQuery = SQL`
     INSERT OR IGNORE INTO sensor (name, firstonline, lastonline)
-    VALUES ($name, $timestamp, $timestamp)
+    VALUES (${name}, ${timestamp}, ${timestamp})
   `;
 
   // update the sensor's last online time
-  const updateSensorQuery = `
+  const updateSensorQuery = SQL`
     UPDATE sensor
-    SET lastonline = $timestamp
-    WHERE name = $name
+    SET lastonline = ${timestamp} WHERE name = ${name}
   `;
 
   // insert a reading into the table 'reading'
-  const insertReadingQuery = `
+  const insertReadingQuery = SQL`
     INSERT INTO reading (sensorname, temperature, pressure, humidity, timestamp)
-    VALUES ($name, $temperature, $pressure, $humidity, $timestamp)
+    VALUES (${name}, ${temperature}, ${pressure}, ${humidity}, ${timestamp})
   `;
 
-  db.prepare(insertSensorQuery)
-    .run(insertData);
-
-  db.prepare(updateSensorQuery)
-    .run(insertData);
-
-  db.prepare(insertReadingQuery)
-    .run(insertData);
+  return dbPromise
+    .then(db => Promise.all([
+      db.run(insertSensorQuery),
+      db.run(updateSensorQuery),
+      db.run(insertReadingQuery)
+    ]))
+    .then(() => console.log('Successfully inserted reading into database.'));
 };
 
 /**
  *  Get sensor data from the database
  */
-const getSensors = (): Sensor[] => {
+const getSensors = (): Promise<Sensor[]> => {
   const query = `
     SELECT *
     FROM sensor
   `;
 
-  return db.prepare(query)
-    .all();
+  return dbPromise
+    .then(db => db.all(query));
 };
 
 /**
  *  Get readings data from the database
  */
-const getReadings = (): Reading[] => {
+const getReadings = (): Promise<Reading[]> => {
   const query = `
     SELECT sensorname, temperature, pressure, humidity, timestamp
     FROM reading
   `;
 
-  return db.prepare(query)
-    .all();
+  return dbPromise
+    .then(db => db.all(query));
 };
 
-export { initializeDB, insertReading, getSensors, getReadings };
+export { insertReading, getSensors, getReadings };
