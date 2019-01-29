@@ -11,7 +11,7 @@ class ReadingTable extends Component<{}, State> {
   };
 
   async fetchReadings() {
-    const response = await fetch('/api/getreadings');
+    const response = await fetch('/api/getreadings/5');
     const data: Reading[] = await response.json();
     this.setState({ data });
   }

@@ -11,7 +11,7 @@ CREATE TABLE Reading (
   pressure NUMERIC(10,2),
   humidity NUMERIC(10,2),
   timestamp TEXT,
-  FOREIGN KEY (sensorname) REFERENCES sensor(name)
+  FOREIGN KEY (sensorname) REFERENCES Sensor(name)
 );
 
 -- Down

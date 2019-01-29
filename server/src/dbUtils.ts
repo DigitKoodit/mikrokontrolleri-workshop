@@ -17,19 +17,19 @@ const insertReading = (reading: NewReading): Promise<void> => {
 
   // If the sensor is not in the 'sensor' table insert it
   const insertSensorQuery = SQL`
-    INSERT OR IGNORE INTO sensor (name, firstonline, lastonline)
+    INSERT OR IGNORE INTO Sensor (name, firstonline, lastonline)
     VALUES (${name}, ${timestamp}, ${timestamp})
   `;
 
   // update the sensor's last online time
   const updateSensorQuery = SQL`
-    UPDATE sensor
+    UPDATE Sensor
     SET lastonline = ${timestamp} WHERE name = ${name}
   `;
 
   // insert a reading into the table 'reading'
   const insertReadingQuery = SQL`
-    INSERT INTO reading (sensorname, temperature, pressure, humidity, timestamp)
+    INSERT INTO Reading (sensorname, temperature, pressure, humidity, timestamp)
     VALUES (${name}, ${temperature}, ${pressure}, ${humidity}, ${timestamp})
   `;
 
@@ -58,10 +58,13 @@ const getSensors = (): Promise<Sensor[]> => {
 /**
  *  Get readings data from the database
  */
-const getReadings = (): Promise<Reading[]> => {
-  const query = `
+const getReadings = (noOfReadings: number = 100): Promise<Reading[]> => {
+  console.log(noOfReadings)
+  const query = SQL`
     SELECT sensorname, temperature, pressure, humidity, timestamp
-    FROM reading
+    FROM Reading
+    ORDER BY timestamp DESC
+    LIMIT ${noOfReadings}
   `;
 
   return dbPromise
