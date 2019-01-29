@@ -18,3 +18,16 @@ interface Reading {
   humidity: number,
   timestamp: string
 }
+
+interface Graph {
+  property: 'temperature' | 'pressure' | 'humidity',
+  points: [{
+    sensorname: string,
+    data: {
+      // seconds from last midnight
+      x: number,
+      // value of the thing measured
+      y: number
+    }
+  }]
+}

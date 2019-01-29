@@ -98,4 +98,11 @@ const getReadings = (): Reading[] => {
     .all();
 };
 
+/**
+ * Format readings into a nice graph-friendly format
+ */
+const formatReadings = (readings: Reading[]): { temperature: Graph, pressure: Graph, Humidity: Graph } => {
+
+}
+
 export { initializeDB, insertReading, getSensors, getReadings };
