@@ -13,7 +13,6 @@ const dbPromise = Promise.resolve()
 const insertReading = (reading: NewReading): Promise<void> => {
   const { name, temperature, pressure, humidity } = reading;
   const timestamp = new Date().toISOString();
-  console.log(reading, timestamp)
 
   // If the sensor is not in the 'sensor' table insert it
   const insertSensorQuery = SQL`
@@ -59,7 +58,6 @@ const getSensors = (): Promise<Sensor[]> => {
  *  Get readings data from the database
  */
 const getReadings = (noOfReadings: number = 100): Promise<Reading[]> => {
-  console.log(noOfReadings)
   const query = SQL`
     SELECT sensorname, temperature, pressure, humidity, timestamp
     FROM Reading

@@ -25,7 +25,7 @@ app.post('/api/newreading', (req: Request, res: Response) => {
 
   insertReading(reading)
     .then(() => res.send(reading))
-    .catch(err => res.status(500).send(err));
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
 });
 
 /**
@@ -36,7 +36,7 @@ app.get('/api/getsensors', (req: Request, res: Response) => {
   console.log('Received getsensors request');
   getSensors()
     .then(sensors => res.send(sensors))
-    .catch(err => res.status(500).send(err));
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
 });
 
 /**
@@ -47,7 +47,7 @@ app.get('/api/getreadings/:noOfReadings', (req: Request, res: Response) => {
   console.log('Received getreadings request');
   getReadings(req.params.noOfReadings)
     .then(readings => res.send(readings))
-    .catch(error => res.status(500).send(error)); // HTTP 500 Internal Server error
+    .catch(error => res.status(500).send(error)); // HTTP 500 Internal Server Error
 });
 
 const port = process.env.PORT || 3001;

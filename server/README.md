@@ -264,7 +264,6 @@ app.post('/api/newreading', (req: Request, res: Response) => {
 });
 ```
 
-// TODO: Päivitä tästä eteenpäin
 ### 6. Toteutetaan getsensors ja getreadings endpointit
 
 Lisätään `types.d.ts`-tiedostoon Sensor ja Reading tyyppimäärittelyt.
@@ -285,44 +284,47 @@ interface Reading {
 }
 ```
 
-
+### 7. Toteutaan datan haku kannasta
 
 ```TypeScript
 ...
 /**
  *  Get sensor data from the database
  */
-const getSensors = (): Sensor[] => {
+const getSensors = (): Promise<Sensor[]> => {
   const query = `
     SELECT *
     FROM sensor
   `;
 
-  return db.prepare(query)
-    .all();
+  return dbPromise
+    .then(db => db.all(query));
 };
 
 /**
  *  Get readings data from the database
  */
-const getReadings = (): Reading[] => {
-  const query = `
+const getReadings = (noOfReadings: number = 100): Promise<Reading[]> => {
+  console.log(noOfReadings)
+  const query = SQL`
     SELECT sensorname, temperature, pressure, humidity, timestamp
-    FROM reading
+    FROM Reading
+    ORDER BY timestamp DESC
+    LIMIT ${noOfReadings}
   `;
 
-  return db.prepare(query)
-    .all();
+  return dbPromise
+    .then(db => db.all(query));
 };
 
-export { initializeDB, insertReading, getSensors, getReadings };
+export { insertReading, getSensors, getReadings };
 ```
 
 Luodaan uudet endpointit `index.ts`-tiedostoon.
 
 ```TypeScript
 ...
-import { initializeDB, insertReading, getSensors, getReadings } from './dbUtils';
+import { insertReading, getSensors, getReadings } from './dbUtils';
 ...
 
 /**
@@ -331,16 +333,20 @@ import { initializeDB, insertReading, getSensors, getReadings } from './dbUtils'
  */
 app.get('/api/getsensors', (req: Request, res: Response) => {
   console.log('Received getsensors request');
-  res.send(getSensors());
+  getSensors()
+    .then(sensors => res.send(sensors))
+    .catch(err => res.status(500).send(err)); // HTTP 500 Internal Server Error
 });
 
 /**
  * GET /api/getreadings
  * List reading data.
  */
-app.get('/api/getreadings', (req: Request, res: Response) => {
+app.get('/api/getreadings/:noOfReadings', (req: Request, res: Response) => {
   console.log('Received getreadings request');
-  res.send(getReadings());
+  getReadings(req.params.noOfReadings)
+    .then(readings => res.send(readings))
+    .catch(error => res.status(500).send(error)); // HTTP 500 Internal Server Error
 });
 
 ...
