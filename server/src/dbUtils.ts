@@ -57,12 +57,12 @@ const getSensors = (): Promise<Sensor[]> => {
 /**
  *  Get readings data from the database
  */
-const getReadings = (noOfReadings: number = 100): Promise<Reading[]> => {
+const getReadings = (limit: number = 100): Promise<Reading[]> => {
   const query = SQL`
     SELECT sensorname, temperature, pressure, humidity, timestamp
     FROM Reading
     ORDER BY timestamp DESC
-    LIMIT ${noOfReadings}
+    LIMIT ${limit}
   `;
 
   return dbPromise

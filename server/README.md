@@ -68,7 +68,6 @@ app.post('/api/newreading', (req: Request, res: Response) => {
   res.send(req.body);
 });
 
-
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
@@ -342,9 +341,9 @@ app.get('/api/getsensors', (req: Request, res: Response) => {
  * GET /api/getreadings
  * List reading data.
  */
-app.get('/api/getreadings/:noOfReadings', (req: Request, res: Response) => {
+app.get('/api/getreadings/:limit', (req: Request, res: Response) => {
   console.log('Received getreadings request');
-  getReadings(req.params.noOfReadings)
+  getReadings(req.params.limit)
     .then(readings => res.send(readings))
     .catch(error => res.status(500).send(error)); // HTTP 500 Internal Server Error
 });
