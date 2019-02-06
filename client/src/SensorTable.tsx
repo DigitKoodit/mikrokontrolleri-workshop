@@ -1,60 +1,44 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Table } from 'react-bootstrap';
 
-interface State {
-  data: Sensor[]
+interface Props {
+  isLoading: boolean,
+  data: Sensor[],
+  error: any
 }
 
-class SensorTable extends Component<{}, State> {
-  state = {
-    data: []
-  };
-
-  async fetchSensors() {
-    const response = await fetch('/api/getsensors');
-    const data: Sensor[] = await response.json();
-    this.setState({ data });
-  }
-
-  componentDidMount() {
-    this.fetchSensors();
-    setInterval(this.fetchSensors.bind(this), 3000); // 3 seconds
-  }
-
-  formatDate(date: string): string {
-    return new Date(date).toLocaleString('fi-FI');
-  }
-
-  render() {
-    const { data } = this.state;
-
-    if (data.length === 0) {
-      return 'Ladataan...';
+const SensorTable = ({ isLoading, data, error }: Props) => (
+  <Table>
+    {
+      error
+        ? error
+        : (
+          <>
+            <thead>
+              <tr>
+                <th>Nimi</th>
+                <th>Ensimmäinen viesti</th>
+                <th>Viimeisin viesti</th>
+              </tr>
+            </thead>
+            <tbody>
+            {
+              data.map(({name, firstonline, lastonline}) => (
+                <tr key={name}>
+                  <td>{name}</td>
+                  <td>{formatDate(firstonline)}</td>
+                  <td>{formatDate(lastonline)}</td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </>
+        )
     }
+  </Table>
+);
 
-    return (
-      <Table>
-        <thead>
-          <tr>
-            <th>Nimi</th>
-            <th>Ensimmäinen viesti</th>
-            <th>Viimeisin viesti</th>
-          </tr>
-        </thead>
-        <tbody>
-        {
-          data.map(({ name, firstonline, lastonline }) => (
-            <tr key={name}>
-              <td>{name}</td>
-              <td>{this.formatDate(firstonline)}</td>
-              <td>{this.formatDate(lastonline)}</td>
-            </tr>
-          ))
-        }
-        </tbody>
-      </Table>
-    );
-  }
-}
+const formatDate = (date: string): string =>
+  new Date(date).toLocaleString('fi-FI');
 
 export default SensorTable;

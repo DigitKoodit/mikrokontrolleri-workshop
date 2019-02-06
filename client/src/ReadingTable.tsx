@@ -1,64 +1,48 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Table } from 'react-bootstrap';
 
-interface State {
-  data: Reading[]
+interface Props {
+  isLoading: boolean,
+  data: Reading[],
+  error: any
 }
 
-class ReadingTable extends Component<{}, State> {
-  state = {
-    data: []
-  };
-
-  async fetchReadings() {
-    const response = await fetch('/api/getreadings/5');
-    const data: Reading[] = await response.json();
-    this.setState({ data });
-  }
-
-  componentDidMount() {
-    this.fetchReadings();
-    setInterval(this.fetchReadings.bind(this), 3000); // 3 seconds
-  }
-
-  formatDate(date: string): string {
-    return new Date(date).toLocaleString('fi-FI');
-  }
-
-  render() {
-    const { data } = this.state;
-
-    if (data.length === 0) {
-      return 'Ladataan...';
-    }
-
-    return (
-      <Table>
-        <thead>
-        <tr>
-          <th>Aika</th>
-          <th>Sensori</th>
-          <th>Lämpötila</th>
-          <th>Ilmanpaine</th>
-          <th>Ilmankosteus</th>
-        </tr>
-        </thead>
-        <tbody>
-        {
-          data.map(({ sensorname, temperature, pressure, humidity, timestamp }) => (
-            <tr key={`${sensorname}-${timestamp}`}>
-              <td>{this.formatDate(timestamp)}</td>
-              <td>{sensorname}</td>
-              <td>{temperature} °C</td>
-              <td>{pressure} hPa</td>
-              <td>{humidity} %</td>
+const ReadingTable = ({ isLoading, data, error }: Props) => (
+  <Table>
+    {
+      error
+        ? error
+        : (
+          <>
+            <thead>
+            <tr>
+              <th>Aika</th>
+              <th>Sensori</th>
+              <th>Lämpötila</th>
+              <th>Ilmanpaine</th>
+              <th>Ilmankosteus</th>
             </tr>
-          ))
-        }
-        </tbody>
-      </Table>
-    );
-  }
-}
+            </thead>
+            <tbody>
+            {
+              data.map(({ sensorname, temperature, pressure, humidity, timestamp }) => (
+                <tr key={`${sensorname}-${timestamp}`}>
+                  <td>{formatDate(timestamp)}</td>
+                  <td>{sensorname}</td>
+                  <td>{temperature} °C</td>
+                  <td>{pressure} hPa</td>
+                  <td>{humidity} %</td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </>
+        )
+    }
+  </Table>
+);
+
+const formatDate = (date: string): string =>
+  new Date(date).toLocaleString('fi-FI');
 
 export default ReadingTable;
