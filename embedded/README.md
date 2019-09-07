@@ -76,3 +76,4 @@ Projektimme includet näyttävät siis suunnilleen tältä:
 #include <Wire.h>
 ```
 
+**[Mennään palvelinpään kimppuun!](../server/)**
